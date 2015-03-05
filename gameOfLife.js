@@ -15,24 +15,18 @@ var GOLWorld = function () {
 	this.grid = [];
 	for (var i = 0; i < HEIGHT; i++) {
 		this.grid[i] = [];
-		for (var j = 0; j < WIDTH; j++) {
-			this.grid[i][j] = 0;
-		}
 	}
 
 	this.next = [];
 	for (i = 0; i < HEIGHT; i++) {
 		this.next[i] = [];
-		for (j = 0; j < WIDTH; j++) {
-			this.next[i][j] = 0;
-		}
 	}
 	
 	this.running = false;
 };
 
 GOLWorld.destroy = function () {
-	GOLWorld._instance = null;
+	_instance = null;
 }
 
 GOLWorld.prototype.init = function (density) {
@@ -40,6 +34,7 @@ GOLWorld.prototype.init = function (density) {
 	for (var i = 0; i < HEIGHT; i++) {
 		for (var j = 0; j < WIDTH; j++) {
 			if (Math.random() < density) this.grid[i][j] = 2;
+			else this.grid[i][j] = 0;
 		}
 	}
 };
@@ -104,8 +99,8 @@ GOLWorld.prototype.draw = function (canvas) {
 				ctx.fillRect(j*RES,i*RES,RES,RES);
 			} else {
 				ctx.clearRect(j*RES,i*RES,RES,RES);
-				ctx.strokeRect(j*RES,i*RES,RES,RES);
 			}
+			ctx.strokeRect(j*RES,i*RES,RES,RES);
 		}
 	}
 	
@@ -136,37 +131,42 @@ function canvasInit () {
 	ctx.stroke();
 }
 
-function start () {
-	
-	//If no world exists, initialize
-	if (!GOLWorld._instance) {
-		canvasInit();
-		var resuming = false;
-	}
-	
-	//Get or create world
+function create () {
+
 	var world = new GOLWorld();
-	if (!resuming) world.init(0.13);
-	
-	//Draw world
+	world.init(0.13);
 	var canv = document.getElementById('c');
-	world.running = true;
 	world.draw(canv);
-	
-	//Tick and display
-	TIME = setInterval(function() {
-		world.tick();
-		world.draw(canv);
-	}, 100);
 }
 
-function pause () {
+function start () {
+	
 	var world = new GOLWorld();
-	clearInterval(TIME);
-	world.running = false;
+
+	if (!world.running) {
+			
+		var canv = document.getElementById('c');
+		world.running = true;
+	
+		//Tick and display new world
+		TIME = setInterval(function() {
+			world.tick();
+			world.draw(canv);
+		}, 50);
+	}
 }
 
 function stop () {
+
+	var world = new GOLWorld();
+	if (world.running) {
+		clearInterval(TIME);
+		world.running = false;
+	}
+}
+
+function reset () {
 	clearInterval(TIME);
 	GOLWorld.destroy();
+	canvasInit();
 }
