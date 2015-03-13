@@ -22,10 +22,13 @@ var GOLWorld = function () {
 		this.next[i] = [];
 	}
 	
+	this.pop = false;
 	this.running = false;
 };
 
 GOLWorld.destroy = function () {
+	this.running = false;
+	this.pop = false;
 	_instance = null;
 }
 
@@ -137,13 +140,14 @@ function create () {
 	world.init(0.13);
 	var canv = document.getElementById('c');
 	world.draw(canv);
+	world.pop = true;
 }
 
 function start () {
 	
 	var world = new GOLWorld();
 
-	if (!world.running) {
+	if (world.pop && !world.running) {
 			
 		var canv = document.getElementById('c');
 		world.running = true;
